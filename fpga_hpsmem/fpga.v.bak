@@ -1,0 +1,15 @@
+module fpga (
+    input wire        clk,
+    input wire        reset_n
+);
+
+
+wire [15:0] h2f_axi_master_awaddr;
+wire        h2f_axi_master_awvalid;
+
+hps_system u0 (
+    .clk_clk         (clk),       // подключаем системный клок
+    .onchip_memory2_0_reset1_reset   (reset_n)    // ресет
+);
+
+endmodule

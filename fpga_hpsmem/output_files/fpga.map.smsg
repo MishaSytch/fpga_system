@@ -1,0 +1,1 @@
+Warning (10236): Verilog HDL Implicit Net warning at hps_sdram_pll.sv(168): created implicit net for "pll_dr_clk" File: C:/Users/misha/Documents/Darkotle/_life/_src/Student/vkr/System/fpga_hpsmem/db/ip/hps_system/submodules/hps_sdram_pll.sv Line: 168

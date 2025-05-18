@@ -1,0 +1,69 @@
+{
+	"partitions" : [
+		{
+			"name" : "Top",
+			"pins" : [
+				{
+					"name" : "ultrasonic_pulse",
+					"strict" : false
+				},
+				{
+					"name" : "avl_readdata[0]",
+					"strict" : false
+				},
+				{
+					"name" : "avl_readdata[1]",
+					"strict" : false
+				},
+				{
+					"name" : "avl_readdata[2]",
+					"strict" : false
+				},
+				{
+					"name" : "avl_readdata[3]",
+					"strict" : false
+				},
+				{
+					"name" : "avl_readdata[4]",
+					"strict" : false
+				},
+				{
+					"name" : "avl_readdata[5]",
+					"strict" : false
+				},
+				{
+					"name" : "avl_readdata[6]",
+					"strict" : false
+				},
+				{
+					"name" : "avl_readdata[7]",
+					"strict" : false
+				},
+				{
+					"name" : "clk",
+					"strict" : false
+				},
+				{
+					"name" : "reset_n",
+					"strict" : false
+				},
+				{
+					"name" : "avl_address[0]",
+					"strict" : false
+				},
+				{
+					"name" : "avl_address[1]",
+					"strict" : false
+				},
+				{
+					"name" : "avl_read",
+					"strict" : false
+				},
+				{
+					"name" : "ultrasonic_echo",
+					"strict" : false
+				}
+			]
+		}
+	]
+}

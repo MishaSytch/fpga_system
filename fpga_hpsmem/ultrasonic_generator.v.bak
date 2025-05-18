@@ -1,0 +1,25 @@
+module ultrasonic_generator(
+    input wire clk,       // Частота FPGA (например, 50 МГц)
+    input wire rst,       // Сброс
+    output reg pulse_out  // Выходной ультразвуковой сигнал
+);
+
+    reg [15:0] counter;
+
+    parameter PULSE_PERIOD = 1250; // 50 МГц / 40 кГц = 1250 тактов
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            counter <= 16'd0;
+            pulse_out <= 1'b0;
+        end else begin
+            if (counter >= (PULSE_PERIOD/2)) begin
+                pulse_out <= ~pulse_out;
+                counter <= 16'd0;
+            end else begin
+                counter <= counter + 16'd1;
+            end
+        end
+    end
+
+endmodule
