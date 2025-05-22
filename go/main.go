@@ -18,30 +18,15 @@ const (
 	FilterWindow        = 5
 	CurrentSampleRateHz = 1e5                      // 0.1 МГц
 	SampleRateHz        = CurrentSampleRateHz * 10 // 10 МГц — типичная частота дискретизации ультразвука
-	FFTKernelSize       = 1000                     // размер окна для FFT
-	FIRKernelSize       = 101                      // нечётное число
+	FFTKernelSize       = 1000                     // Размер окна для FFT
+	FIRKernelSize       = 101                      // Нечётное число
 	LowCutoffFreq       = 1e-3                     // 0.001 Гц
 	HighCutoffFreq      = 1e6                      // 1 МГц
-	EchoThreshold       = 0.6                      // порог обнаружения эха
+	EchoThreshold       = 0.6                      // Порог обнаружения эха
 	Threshold           = 0.5
 	Thickness           = 10.0 // Толщина образца в мм
 	Mode                = "A0" // Модальный режим ("A0" или "S0")
 )
-
-func bToMb(b uint64) uint64 {
-	return b / 1024 / 1024
-}
-
-func logSettings() (*os.File, error) {
-	logFile, err := os.OpenFile("ultrasound_log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		log.Printf("❌ Не удалось открыть лог-файл: %v\n", err)
-		return &os.File{}, err
-	}
-	log.SetOutput(logFile)
-
-	return logFile, nil
-}
 
 func main() {
 	logFile, err := logSettings()
@@ -161,4 +146,19 @@ func processing(data []float64) {
 
 	log.Println("Анализ проведен")
 	time.Sleep(ultrasignal.FreqToTime(CurrentSampleRateHz))
+}
+
+func bToMb(b uint64) uint64 {
+	return b / 1024 / 1024
+}
+
+func logSettings() (*os.File, error) {
+	logFile, err := os.OpenFile("ultrasound_log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Printf("❌ Не удалось открыть лог-файл: %v\n", err)
+		return &os.File{}, err
+	}
+	log.SetOutput(logFile)
+
+	return logFile, nil
 }
