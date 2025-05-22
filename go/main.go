@@ -9,6 +9,7 @@ import (
 	"math"
 	"os"
 	"runtime"
+	"sync"
 	"time"
 )
 
@@ -40,9 +41,9 @@ func main() {
 		for {
 			runtime.ReadMemStats(&m)
 			fmt.Printf("Количество горутин: %d\n", runtime.NumGoroutine())
-			fmt.Printf("Текущий объем занятой памяти: %d\n", bToMb(m.Alloc))
-			fmt.Printf("Всего выделенно памяти во время запуска: %d\n", bToMb(m.TotalAlloc))
-			fmt.Printf("Объем памяти, полученный от операционной системы: %d\n", bToMb(m.TotalAlloc))
+			fmt.Printf("Текущий объем занятой памяти: %d b\n", bToMb(m.Alloc))
+			fmt.Printf("Всего выделенно памяти во время запуска: %d b\n", bToMb(m.TotalAlloc))
+			fmt.Printf("Объем памяти, полученный от операционной системы: %d b\n", bToMb(m.TotalAlloc))
 			fmt.Printf("Количество cpu: %d\n", runtime.NumCPU())
 		}
 	}()
@@ -72,19 +73,24 @@ func main() {
 	}(raw)
 
 	log.Println("Сбор данных")
-loop:
+	var once sync.Once
 	for {
-		select {
-		case data := <-raw:
-			dataBuffer = append(dataBuffer, data...)
-			log.Printf("Длина полученных данных: %+v", len(dataBuffer))
-			if len(dataBuffer) >= FFTKernelSize {
-				break loop
+	loop:
+		for {
+			select {
+			case data := <-raw:
+				dataBuffer = append(dataBuffer, data...)
+				log.Printf("Длина полученных данных: %+v", len(dataBuffer))
+				if len(dataBuffer) >= FFTKernelSize {
+					break loop
+				}
 			}
 		}
-	}
 
-	processing(dataBuffer)
+		once.Do(func() {
+			go processing(dataBuffer)
+		})
+	}
 }
 
 func processing(data []float64) {
@@ -149,7 +155,7 @@ func processing(data []float64) {
 }
 
 func bToMb(b uint64) uint64 {
-	return b / 1024 / 1024
+	return b
 }
 
 func logSettings() (*os.File, error) {
