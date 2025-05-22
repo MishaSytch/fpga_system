@@ -4,17 +4,17 @@
 package memory
 
 import (
+	"encoding/binary"
 	"fmt"
 	"os"
-	"unsafe"
 
 	mmap "github.com/edsrzf/mmap-go"
 )
 
 const (
-	FrameSize    = 1024      // Размер фрейма в 16-битных значениях
-	TargetOffset = 0x2000000 // Физический адрес (пример для FPGA)
-	PageSize     = 4096      // Размер страницы памяти
+	FrameSize    = 1024
+	TargetOffset = 0x2000000
+	PageSize     = 4096
 )
 
 func ReadFrame(path string, freq float64, data *[]float64) error {
@@ -22,25 +22,17 @@ func ReadFrame(path string, freq float64, data *[]float64) error {
 		path = "/dev/mem"
 	}
 
-	file, err := os.OpenFile("/dev/mem", os.O_RDWR|os.O_SYNC, 0)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_SYNC, 0)
 	if err != nil {
 		return fmt.Errorf("open %s failed: %w", path, err)
 	}
 	defer file.Close()
 
-	// 2. Выравнивание параметров
-	alignedOffset := TargetOffset & ^(uintptr(PageSize) - 1)
+	alignedOffset := TargetOffset & ^(PageSize - 1)
 	offsetInPage := TargetOffset - alignedOffset
-	length := FrameSize * 2 // 2 байта на значение
+	length := FrameSize * 2 // 2 bytes per uint16
 
-	// 3. Отображение памяти через mmap-go
-	mem, err := mmap.MapRegion(
-		file,
-		int(offsetInPage)+length, // Общая длина
-		mmap.RDONLY,
-		mmap.ANON,
-		int64(alignedOffset), // Выровненное смещение
-	)
+	mem, err := mmap.MapRegion(file, offsetInPage+length, mmap.RDONLY, 0, int64(alignedOffset))
 	if err != nil {
 		return fmt.Errorf("mmap failed: %w", err)
 	}
@@ -48,7 +40,7 @@ func ReadFrame(path string, freq float64, data *[]float64) error {
 
 	values := make([]float64, FrameSize)
 	for i := 0; i < FrameSize; i++ {
-		raw := *(*uint16)(unsafe.Pointer(&mem[i*2]))
+		raw := binary.LittleEndian.Uint16(mem[offsetInPage+i*2 : offsetInPage+i*2+2])
 		values[i] = float64(raw)
 	}
 
